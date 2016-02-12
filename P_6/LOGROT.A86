@@ -1,0 +1,115 @@
+;***************************************************************
+;  Befehlsbeispiele zum Thema logische und shift/rotate Befehle 
+;***************************************************************
+.MODEL small
+
+;------------  code section  ------------------------
+.CODE
+
+start:     MOV   AX,@data       ; Anfang Datensegment
+           MOV   DS,AX          ; in DS-Register laden
+
+;*****************************************************
+;     Logische Befehle 
+;*****************************************************                
+LOOPA:
+           MOV     BX,0FFFFH 
+           AND     BX,0FFFEH 
+           AND     BX,0FFEFH 
+           AND     BX,0FEFFH 
+           AND     BX,0FFF7H
+           AND     BX,0F0FFH
+                
+           MOV     CX,0
+           OR      CX,800H
+           OR      CX,400H
+           OR      CX,200H
+           OR      CX,100H
+           OR      CX,70H
+                
+           MOV     SI,10H
+           MOV     [SI],0FFFFH
+           XOR     [SI],5555H
+           XOR     [SI],5555H
+           XOR     [SI],5555H
+           XOR     [SI],1111H
+                
+           MOV     AX,0
+           NOT     AX
+           NOT     AX
+           INC     AX
+           NEG     AX
+ 
+;*****************************************************
+;     Rotations-Befehle 
+;***************************************************** 
+
+           MOV     BL,10H
+           ROL     BL,1
+           ROL     BL,1
+           ROL     BL,1
+           ROL     BL,1
+           ROL     BL,1
+           ROR     BL,1
+           ROR     BL,1
+           ROR     BL,1
+           ROR     BL,1
+           ROR     BL,1       
+
+           MOV     BH,05H
+           MOV     CL,4
+           ROL     BH,CL
+           ROL     BH,CL
+           ROL     BH,CL
+                
+           CLC
+           STC
+           CLC
+           MOV     BX,5555H
+           RCL     BX,1
+           RCL     BX,1
+           RCL     BX,1
+           RCL     BX,1
+           RCL     BX,1
+           RCR     BX,1
+           RCR     BX,1
+           RCR     BX,1
+           RCR     BX,1
+           RCR     BX,1
+                                
+           CLC
+           MOV     AX,8000H
+           MOV     BX,0
+           RCL     AX,1
+           RCR     BX,1
+           RCR     BX,1
+
+           MOV     AL,55H
+           ROL     AL,1
+           ROL     AL,1
+           ROL     AL,1
+           ROL     AL,1
+           SHL     AL,1
+           SHL     AL,1
+           SHL     AL,1
+           SHL     AL,1
+           SHL     AL,1
+           SHR     AL,1
+           SHR     AL,1
+           SHR     AL,1
+           SHR     AL,1
+           SHR     AL,1
+
+           MOV     BX,8060H
+           MOV     CL,2
+           SAR     BX,CL
+           SAR     BX,cl
+                
+           JMP     LOOPA  
+
+;------------  data section  ------------------------
+.DATA
+
+.STACK 100h
+;------------- end of program ------------------------
+           END   start

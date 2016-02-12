@@ -1,0 +1,68 @@
+;******************************************************************************
+                NAME    SUMDIFF
+;******************************************************************************
+;  Funktion:    Liest op1 von den Schiebeschaltern an Adresse 705h sowie op2 von
+;               den Schiebeschaltern an Adresse 704h und bildet die Summe
+;               (op1 + op2) und die Differenz (op1 - op2).
+;               Die Summe wird auf die 8 LEDs an Adresse 701h (links) ausge-
+;               geben. Die Differenz wird an die 8 LEDS an Adresse 700h (rechts)
+;               ausgegeben.
+;******************************************************************************
+.MODEL small
+.186
+
+;-----------    Symbol Definitionen  (= Konstanten)    --------------------
+LED_LOADDR              EQU     0700h
+LED_HIADDR              EQU     0701h	; LINKS
+SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR       EQU     0704h
+DIP_SWITCH_HIADDR       EQU     0705h	; LINKS
+KEYS_ADDR               EQU     0706h
+DATA_DISPLAY_ADDR       EQU     0708h
+
+;------------  code section  ----------------------------------------------
+.CODE
+
+start:          MOV   AX,@data       ; Anfang des Datensegments
+                MOV   DS,AX          ; laden
+
+endless:
+             
+				; EINLESEN
+				MOV DX, DIP_SWITCH_LOADDR	; 704 ADRESSE
+				IN AX, [DX]					; (16 BIT)	inkl.705			
+											; in AL steht 704, in AH steht 705
+				
+				
+				; AX IN REGISTER SPEICHERN	; AH darf kein Operand sein. Deszahl zwischenspeichern
+				MOV BX, AX					;
+				
+				; ADDITION
+				ADD AL, BH					; AH + AL
+											; In AL steht Ergebnis der Summe
+				MOV AH, AL					; Für die Ausgabe muss die Summe im AH stehen
+				
+				; SUBSTRAKTION				; AH und AL sind belegt. Deshalb mit Register arbeiten
+				SUB BH, BL					; AH - AL
+				MOV AL, BH
+
+				; INVERTIEREN (LOW AKTIV)
+				NOT AX						; Schreibt invertiereten Wert direkt in AX
+									
+				; AUSGEBEN AL und AH
+				MOV DX, LED_LOADDR			; 700 ADRESSE 
+				OUT [DX], AX				; (16 Bit) 700 und 701 mit 704 und 705
+				
+
+                ;---- Add your code above ----
+                JMP     endless
+
+;------------  data section  --------------------------------------------
+.DATA
+
+;------------  stack section  --------------------------------------------
+.STACK 100h
+
+;-------------------------------------------------------------------------
+                END     start
+

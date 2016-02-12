@@ -1,0 +1,46 @@
+; CT2 - Praktikum 5: Anschluss zwei ROM-Bausteine
+;						Eproms erhalten Grundadresse über !CE-Eingang		
+;
+; Bus timing with logic analyzer
+;
+;---------------------------------------------------------------
+
+.186
+.model small
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX     
+                
+endless:   
+
+                MOV 	DX, 708h	; Adresse Datenport
+                MOV 	BX, 0400h	; Ab diesem Offset Fehler suchen
+                
+schleife:		CMP		BL, ES: [BX]
+				JNE		falsch
+				
+richtig:		INC 	BX
+				CMP 	BL, 0
+				JNE 	schleife
+				
+				
+falsch:			MOV 	AL, ES: [BX]
+				MOV		AH, BL
+				OUT		[DX], AX
+				INC		BX
+				CMP		BL, 0
+				JNE 	schleife
+				
+			
+
+ 
+ 				JMP     endless
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start
+
+                

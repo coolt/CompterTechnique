@@ -1,0 +1,70 @@
+;----------------------------------------------------
+; CT Praktikum 9
+;------------  Initial Declarations  ----------------
+
+SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR       EQU     0704h
+KEYS_ADDR               EQU     0706h
+DATA_DISPLAY_ADDR       EQU     0708h
+
+.MODEL small
+.186
+
+;------------  code section  ------------------------
+.CODE
+public		readKey0:near
+public		readSwitches:near
+public		Write7Seg:near
+public		WriteHexDisplay:near
+
+endless:    
+              
+readKey0:	PROC NEAR
+
+			PUSH AX
+			PUSH DX
+			MOV DX, KEYS_ADDR 
+			IN AX,  [DX] 
+   			NOT AX				; Achtung low aktiv       
+            AND AX, 01h
+            MOV var1, AL  
+            POP DX
+            POP AX           
+            RET  
+              
+ readSwitches: PROC NEAR
+ 			PUSH AX
+ 			IN AX, DIP_SWITCH_LOADDR
+ 			NOT AX				; Achtung low aktiv       
+ 			MOV var2, AX
+ 						
+ 			POP AX
+ 			RET     
+ 			        
+              
+Write7Seg:	PROC NEAR
+			MOV DX, SEG7_ADDR
+			OUT [DX], var1
+			RET             
+              
+WriteHexDisplay: PROC NEAR
+
+			MOV DX, DATA_DISPLAY_ADDR
+			OUT [DX], var2
+			RET             
+             
+               
+            JMP     endless
+
+;------------  data section  ------------------------
+.DATA
+PUBLIC var1, var2				; var1 braucht es nicht, da AX eine Variable speichern kann
+
+var1 DB	0h
+var2 DB	0h
+
+;------------  stack section  ------------------------
+.STACK 100h
+
+;------------- end of program ------------------------
+             END     

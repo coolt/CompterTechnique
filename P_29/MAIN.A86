@@ -1,0 +1,63 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 209
+; Modulare Programmierung
+; Würfel
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+
+;-----------------CODE------------------------------------------
+.CODE
+
+;-----------------Externe Programme------------------------------
+
+;----Dice.A86-----
+extrn		readDice:near
+extrn		incDice:near
+
+;----Inout.A86----
+extrn		readKey0:near
+extrn		readSwitches:near
+extrn		Write7Seg:near
+extrn		WriteHexDisplay:near
+
+;----Stat.A86-----
+extrn		addThrow:near
+extrn		readThrows:near
+
+;---------------------Main----------------------------------------
+start:          MOV     AX,@data
+                MOV     DS,AX
+                
+endless:        CALL 	readKey0			; Funktionsaufruf
+                CMP 	AX,0
+                JZ		keyNotPressed
+                
+keyPressed:		CALL	readDice
+				PUSH	AX
+				CALL	Write7Seg
+				POP		AX
+				CALL	addThrow
+				
+keyNotPressed:	CALL 	incDice
+				CALL	readSwitches
+
+displayThrows:	CALL	readThrows
+				CALL	WriteHexDisplay
+				JMP		endless				                
+                
+
+:-----------------DATA------------------------------------------               
+.DATA
+EXTRN var1, var2
+
+wert	DB	0
+
+;-----------------STACK-----------------------------------------
+.STACK 100h
+
+;----- Programm-Ende ------------------------------------------
+                END start

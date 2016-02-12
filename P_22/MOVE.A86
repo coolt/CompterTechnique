@@ -1,0 +1,47 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 2
+;
+; Bus timing with logic analyzer: Memory accesses
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX
+                
+                MOV     AX,8800h
+                MOV     ES,AX
+                
+                MOV     BX,0000h              
+
+endless:        ; Write/read byte even
+                MOV     AL,12h
+                MOV     ES:[BX],AL
+                MOV     AL,ES:[BX]
+
+                ; Write/read byte odd
+                MOV     AL,34h
+                MOV     ES:[BX+1],AL
+                MOV     AL,ES:[BX+1]
+                
+                ; Write word even
+                MOV     AX,5678h
+                MOV     ES:[BX+2],AX
+                MOV     AX,ES:[BX+2]
+                
+                ; Write word odd
+                MOV     AX,0ABCDh
+                MOV     ES:[BX+3],AX
+                MOV     AX,ES:[BX+3]
+
+                JMP     endless
+                
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start

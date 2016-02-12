@@ -1,0 +1,44 @@
+; CT2 - Praktikum 5: Ausgabe eines Binärwertes an Hex-Anzeige	
+;
+; Bus timing with logic analyzer
+;
+;---------------------------------------------------------------
+
+.186
+.model small
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX     
+                
+endless:   
+
+                MOV 	DX, 702h	; Adresse Hex-Anzeige
+                MOV 	BX, 320h	; Ab diesem Offset ist die Umwandlungstabelle von Binär in Hex
+                
+                ; Byte-Wert vorgeben
+                ;MOV AL, 101010B
+                             
+;schleife:       ; Adresse Binärwert
+;                CMP AL,  [BX]
+;                JMP
+                
+richtig:        ; Adresse + 1 = Byte für Hexsegment
+                
+
+				
+				; Ausgabe an Hexsegment
+				OUT [DX], AL
+
+;falsch:			INC BX
+;				JMP schleife
+ 
+ 				JMP     endless
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start
+
+                

@@ -1,0 +1,87 @@
+;----------------------------------------------------
+; CT Praktikum 3: Introduction to Assembler
+;
+;------------  Initial Declarations  ----------------
+LED_LOADDR              EQU     0700h
+LED_HIADDR              EQU     0701h
+SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR       EQU     0704h
+DIP_SWITCH_HIADDR       EQU     0705h
+KEYS_ADDR               EQU     0706h
+DATA_DISPLAY_ADDR       EQU     0708h
+
+.MODEL small
+.186
+
+;------------  code section  ------------------------
+.CODE
+
+start:          MOV   AX,@data          ; Load the start of the Data segment
+                MOV   DS,AX             ; into the DS register
+                NOP
+
+endless:    
+                MOV     AX,0                    ; *** A0 ***
+                
+                ; write byte value from table to LEDs
+                MOV     DX,LED_LOADDR
+                MOV     AL,byteTable            ; *** A1 ***
+                OUT     [DX],AL
+            
+                ; write byte value from table to LEDs
+                MOV     DX,LED_HIADDR
+                MOV     BX,OFFSET byteTable + 1
+                MOV     AL,[BX]                 ; *** A2 ***
+                OUT     [DX],AL
+
+                ; write byte value from table to LEDs
+                MOV     DX,LED_LOADDR
+                MOV     BX,OFFSET byteTable
+                MOV     AL,[BX+2]               ; *** A3 ***
+                OUT     [DX],AL
+
+                ; write byte value from table to LEDs    
+                MOV     DX,LED_HIADDR
+                MOV     BX,OFFSET byteTable
+                MOV     SI,3
+                MOV     AL,[BX+SI]              ; *** A4 ***
+                OUT     [DX],AL
+
+                ; write word value from table to LEDs
+                MOV     DX,LED_LOADDR
+                MOV     SI,0
+                MOV     AX,wordTable[SI]        ; *** A5 ***
+                OUT     [DX],AX
+                
+                ; write word value from table to LEDs
+                MOV     DX,LED_LOADDR
+                MOV     BX,2
+                MOV     SI,2
+                MOV     AX,wordTable[BX+SI]     ; *** A6 ***
+                OUT     [DX],AX                
+                
+                MOV     BX,OFFSET demoTable1
+                MOV     BYTE PTR [BX],66h       ; write a byte
+                MOV     WORD PTR [BX],55h       ; write a word
+
+                JMP     endless
+
+;------------  data section  ------------------------
+.DATA
+byteValue1      DB      ?
+byteValue2      DB      33h
+wordValue1      DW      ?
+wordValue2      DW      789Ah
+byteTable       DB      01h, 02h, 04h, 08h
+wordTable       DW      0FEFFh, 0FDFFh, 0FBFFh, 0F7FFh
+demoString      DB      'Hello'
+demoTable1      DB      4  DUP (77h)
+demoTable2      DB      3  DUP (?)
+demoTable3      DW      4  DUP (99AAh)
+demoTable4      DW      2  DUP (?)
+
+;------------  stack section  ------------------------
+.STACK 100h
+
+;------------- end of program ------------------------
+                END     start       ; start address for loader

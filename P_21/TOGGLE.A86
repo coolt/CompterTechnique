@@ -1,0 +1,32 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 1
+;
+; Measure instruction execution times
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+OUTPORT_ADDR            EQU     703h	; externer Output
+TOGGLE_MASK             EQU     01h		; 0000 0001
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX
+
+                MOV     AL, 0
+                MOV     DX, OUTPORT_ADDR
+
+endless:        XOR		xyz,TOGGLE_MASK
+				MOV		AL, xyz22222222222222
+				OUT		[DX],AL				               
+                JMP     endless				; short jump (von 23 zu 21)
+.DATA
+				foo db 0
+				bar db 0
+				xyz db 0
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start

@@ -1,0 +1,41 @@
+; CT2 - Praktikum 4: IO Test
+;				   Erlaubte Befehle: IN, OUT
+;				   Anschluss Controllbus IOR, IOW
+;
+; Bus timing with logic analyzer
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+;LED_LOADDR              EQU     0700h	; LED rechts
+;LED_HIADDR              EQU     0701h
+;SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR        EQU     0704h	; Schalter rechts
+DIP_SWITCH_HIADDR        EQU     0705h	; Schalter links
+;KEYS_ADDR               EQU     0706h
+;DATA_DISPLAY_ADDR       EQU     0708h
+
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX                
+
+endless:        ;einlesen über Schalter: Simon's Art 
+				; von Hand stecken
+ 				
+ 				MOV DX, 604h
+ 				IN  AX, [DX]
+ 				
+ 				;ausgeben
+                OUT		[DX], AX	
+        
+	                               
+
+                JMP     endless
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start

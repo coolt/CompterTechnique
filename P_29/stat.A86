@@ -1,0 +1,28 @@
+;----------------------------------------------------
+; CT Praktikum 9
+;------------  Initial Declarations  ----------------
+
+SEG7_ADDR               EQU     0702h
+KEYS_ADDR               EQU     0706h
+
+.MODEL small
+.186
+
+;------------  code section  ------------------------
+.CODE
+public		addThrow:near
+public		readThrows:near
+
+endless:    
+               
+                JMP     endless
+
+;------------  data section  ------------------------
+.DATA
+
+
+;------------  stack section  ------------------------
+.STACK 100h
+
+;------------- end of program ------------------------
+                END     

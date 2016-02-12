@@ -1,0 +1,98 @@
+;******************************************************************************
+                NAME    FLAG_SUMDIFF
+;******************************************************************************
+;  Funktion:    Mit JUMP-Befehlen Carry auslesen
+;               Immer auf negativer Fall prüfen (entspricht dem else)
+;               Der positive Fall (if) triff ein, falls der negative nicht da ist
+;               
+;******************************************************************************
+.MODEL small
+.186
+
+;-----------    Symbol Definitionen  (= Konstanten)    --------------------
+LED_LOADDR              EQU     0700h
+LED_HIADDR              EQU     0701h	; LINKS
+SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR       EQU     0704h
+DIP_SWITCH_HIADDR       EQU     0705h	; LINKS
+KEYS_ADDR               EQU     0706h
+DATA_DISPLAY_ADDR       EQU     0708h
+
+;------------  code section  ----------------------------------------------
+.CODE
+
+start:          MOV   AX,@data       ; Anfang des Datensegments
+                MOV   DS,AX          ; laden
+
+endless:
+				; CL ALS TEMPORÄRER SPEICHER
+				MOV CL, 0FFH				; 0FFh entspricht allen LED aus (low aktiv)
+             
+				; EINLESEN
+				MOV DX, DIP_SWITCH_LOADDR	; 704 ADRESSE
+				IN AX, [DX]					; (16 BIT)	inkl.705			
+											; in AL steht 704, in AH steht 705
+				
+				
+				; AX IN REGISTER SPEICHERN	; AH darf kein Operand sein. Deszahl zwischenspeichern
+				MOV BX, AX					;
+				
+				; ADDITION----------------------------------------------------------------------------
+				ADD AL, BH					; AH + AL
+											; In AL steht Ergebnis der Summe
+				MOV AH, AL					; Für die Ausgabe muss die Summe im AH stehen
+				
+				; FLAG Addition
+				JNC		keinCarryAdd		; Falls Carry = 0, Code überspringen
+				
+				; CARRYFLAG IST GESETZT
+CarryAnd:		PUSHF						; Flag von AL, BH auf Stack speichern
+				AND CL, 11011111b			; Variabel in CL muss ändern (! Flags ändern sich auch)
+				POPF						; Flag von AL, BH wieder als Flags setzen
+				
+				; AUS HEX PORT 702		
+				MOV DX, 702h
+				MOV AX, CX					; Out geht nur über AL oder AX
+				OUT [DX], AX				; CL  = B5 muss brennen
+				MOV CL, 0FFh				; CL wieder in Ursprungszustand			
+keinCarryAdd:
+
+				;------------------------------------------------------------------------------------				
+				; SUBTRAKTION				; AH und AL sind belegt. Deshalb mit Register arbeiten
+				SUB BH, BL					; AH - AL
+				MOV AL, BH
+				
+				; Hex-Anzeige neutral stellen
+				MOV DX, 702h				; Port 702
+				MOV AX, CX					;
+				OUT [DX], AX
+
+				; Flag Subtraktion
+				JNC	keinCarrySub			; Überspringen des nächsten Labels, falls kein Carry
+CarrySub:		PUSHF						
+				AND CL, 0FEh				; B1 muss an sein
+				POPF				
+				
+				
+keinCarrySub:
+				
+				; INVERTIEREN (LOW AKTIV)
+				NOT AX						; Schreibt invertiereten Wert direkt in AX
+									
+				; AUSGEBEN AL und AH
+				MOV DX, LED_LOADDR			; 700 ADRESSE 
+				OUT [DX], AX				; (16 Bit) 700 und 701 mit 704 und 705
+				
+
+                ;---- Add your code above ----
+                JMP     endless
+
+;------------  data section  --------------------------------------------
+.DATA
+
+;------------  stack section  --------------------------------------------
+.STACK 100h
+
+;-------------------------------------------------------------------------
+                END     start
+

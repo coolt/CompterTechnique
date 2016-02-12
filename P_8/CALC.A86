@@ -1,0 +1,76 @@
+;------------------------------------------------------------------
+; CT1 Praktikum 8: Taschenrechner
+;
+; Das Programm liest zwei 8 bit Operanden von den Schiebeschaltern.
+; Die auszuführende Operation wird über den Hex-Codier-Schalter
+; eingestellt. Das Resultat wird an die LEDs ausgegeben.
+;------------------------------------------------------------------
+.MODEL small
+
+;------------  Konstantendeklarationen -------------
+led_addr          EQU   700h
+dip_switch_addr   EQU   704h
+turn_Switch_addr  EQU   706h	; 4 Bit Tasten, 4 Bit Dreher
+hex_display_addr  EQU   708h
+
+;------------  code section  ------------------------
+.CODE
+
+start:     MOV   AX,@data       ; Anfang Datensegment
+           MOV   DS,AX          ; in DS-Register laden
+ 
+readOps: 	; EINLESEN
+			MOV DX, DIP_SWITCH_LOADDR	; 704 ADRESSE
+			IN AX, [DX]					; (16 BIT)	inkl.705			
+											; in AL steht 704, in AH steht 705
+						
+			; AX IN REGISTER SPEICHERN	; AX wird für das Einlesen des Switch wieder gebraucht
+			MOV CX, AX					;
+				         
+readSwitch:	; EINLESEN           
+           	MOV DX, turn_Switch_addr	; 16 Bit (9 - 15 sind Dreher)
+           	MOV AX, [DX]
+           	SHR AL, 4					; ??????????
+           
+           
+           
+switchCase:
+           ; Mehrfachauswahl basierend auf dem Inhalt von BX 
+           CMP   BX,2d          ; ..... Wert anpassen 
+           JGE   default
+           SHL   BX,1
+           JMP   word ptr jumptable[BX]
+           
+alloff:    
+           ; ..... Code ergänzen für Operation 0 d.h. alles dunkel
+           JMP   displayLeds
+           
+addops:
+           ; ..... Code ergänzen für Operation 1 d.h. Addition
+           JMP   displayLeds
+       
+           ; ..... Code ergänzen für Operationen 2 bis 11
+                   
+default:   
+           ; ..... Code ergänzen für alle anderen Fälle
+           
+displayLeds: 
+           ; Ausgabe des Resultates auf LEDs
+           ; ..... Code ergänzen
+             
+           JMP   readOps 
+           
+jumptable:
+           ; Tabelle im Codebereich
+           ; Enthält die Sprungadressen für die verschiedenen Operationen
+           DW    OFFSET alloff
+           DW    OFFSET addops
+           
+           ; ..... Tabelle mit weiteren Operationen ergänzen
+           
+;------------  data section  ------------------------
+.DATA
+
+.STACK 100h
+;------------- end of program ------------------------
+           END   start

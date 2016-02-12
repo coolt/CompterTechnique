@@ -1,5 +1,10 @@
 # CT: Nur C-Files share
-# No executables
+# No executables and settings
 **/*.MAP
 **/*.OBJ
 **/*.EXE
+**/*.prefs
+**/*.LST
+
+# No old projects
+P_27_old

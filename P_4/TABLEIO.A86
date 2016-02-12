@@ -1,0 +1,110 @@
+;----------------------------------------------------
+; CT Praktikum 4: Transfer Befehle
+; Program frame
+;----------------------------------------------------
+.MODEL small
+.186
+
+;------------  Initial Declarations  ----------------
+LED_LOADDR              EQU     0700h	; LED rechts
+LED_HIADDR              EQU     0701h
+SEG7_ADDR               EQU     0702h
+DIP_SWITCH_LOADDR       EQU     0704h	; Schalter rechts
+DIP_SWITCH_HIADDR       EQU     0705h	; Schalter links
+KEYS_ADDR               EQU     0706h
+DATA_DISPLAY_ADDR       EQU     0708h
+
+LOW_NIBBLE_MASK         EQU     0Fh		; Nur die vier tiefsten Bits bleiben erhalten	0Fh = 00001111b 		//Mit dem logischen AND bleiben nur die vier unteren Bits bestehen   //Sinnvoll nicht den Hexwert nach AND zu notieren, sondern was durch die Maske erhalten bleibt.
+KEY_B0                  EQU     1
+
+;------------  code section  ------------------------
+.CODE										; INDEXE VOM LINKEN SCHALTER EINLESEN
+											; Über den linken Schalter sollen die Tabellenwerte ausgewählt werden können.
+											; Die Werte, die beim linken Schalter eingelesen werden gelten somit als Indexe für die Tabelle
+											; !! Die grösse des Registers muss zur Grösse der eingelesenen Werte passen
+											
+											; Nur die ersten vier Schalter sollen eingelesen werden. D.h. nur die hinteren vier Bits sollen gespeichert werden
+											; Das geschieht durchs Maskieren
+											
+											; WERTE VOM SCHALTER RECHTS EINLESEN
+											; Einlesen Wert
+											; 
+											; Ausgabe Index -> Led
+											; Ausgabe Wert -> Led
+											; Wer in Tabelle bei Index speichern
+
+start:          MOV     AX,@data          	; Load the start of the Data segment
+                MOV     DS,AX             	; into the DS register
+                NOP
+				
+				
+endless:    
+                CALL    waitForKey			; !!! ist ein Unterprogramm: es funktioniert nur, wenn an Port 706 eine Taste gedrückt wird !!!!
+                
+				; Wert von Schalter links einlesen  DAS GIBT DIE INDEXE FÜR DIE TABELLE
+				
+				_Table DB 16 DUP (?) 		; Zuerst: Array für Wertspeicherung von 16 Bytes bereitstellen
+				MOV	DX, DIP_SWITCH_HIADDR 	; Kopieren der Adresse von Schaler links in DX.					!! DX ist per default der Einleseort von von Adressen (2 Byte) für IN !!! 
+											; Weil die Adresse grösser als 1 Byte ist, kann sie nicht direkt mit IN AL, DIP_SWITCH_HIADDR eingesen werden !!
+											; Es MUSS über DX eingelesen werden
+				IN AL, [DX]					; Einlesen des Wertes beim linken Schalter. Der Schalter hat 8 Eingänge hat. AL hat 8 Speicherplätze. AL genügt somit als Speicher. 
+				
+				; Schalterwert auf 1 Nibbel kürzen mit dem logischen AND
+				
+				AND AL, LOW_NIBBLE_MASK		; Nur die vier hintersten Bits bleiben
+				MOV AH, AL					; Die Werte sollen in den vorderen Teil (AH) geschrieben werden.			->  0000xxxx--------   X = INDEX
+				
+				; Wert vom Schalter rechts einlesen  DAS GIBT DIE WERTE FÜR DIE ELEMENTE IN DER TABELLE
+				
+				MOV DX, DIP_SWITCH_LOADDR	; Adresse im Register DX speichern
+				IN AL, [DX]					; Wert des rechten Schalter in das vordere Register schreiben. (Der hintere Teil , AH, ist bereits mit den 4 Werten des rechten Schalters belegt)
+											; 																			->  0000xxxxyyyyyyyy		-> Y = WERT FÜR TABELLE
+				
+				; DEN WERT AN DER LED ANZEIGEN
+				MOV DX, LED_LOADDR			; Adresse der LED rechts in DX				
+				OUT [DX], AL				; Der Wert von AL (rechter Schalter) soll ausgegeben werden
+				
+				
+				; SPEICHERN IN TABELLE
+				MOV BH, 0					; Das Register wird auf 0000000000000000 gesetzt
+				MOV BL, AH					; AH = Indexe, sind eingelesen über den linken Schalter.		Der linke Teil von BH (BL) erhält die 8 Bits von AL. Wobei davon nur 4 gesetzt sind, wegen der Maske
+				MOV _Table [BX], AL		; Der Wert von AL wird in den Index von BX gelegt.
+
+
+             	; Tabelle selber Werte zuweisen
+
+                JMP     endless
+
+;----------------------------------------------------
+; Subroutines
+;----------------------------------------------------
+waitForKey:
+        ; Wait until the key B0 is pressed (asserted)
+        ; and released again
+                PUSH    DX
+                PUSH    AX
+                MOV     DX,KEYS_ADDR
+
+waitForAssert:
+                IN      AL,[DX]
+                TEST    AL,KEY_B0
+                JNZ     waitForAssert
+
+waitForRelease:
+                IN      AL,[DX]
+                TEST    AL,KEY_B0
+                JZ      waitForRelease
+                
+                POP     AX
+                POP     DX
+                RET
+;----------------------------------------------------
+
+;------------  data section  ------------------------
+.DATA
+
+;------------  stack section  ------------------------
+.STACK 100h
+
+;------------- end of program ------------------------
+                END     start       ; start address for loader

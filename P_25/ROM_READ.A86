@@ -1,0 +1,40 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 5: Anschluss zwei ROM-Bausteine
+;						Eproms erhalten Grundadresse über !CE-Eingang		
+;
+; Bus timing with logic analyzer
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+D7SEG_ADDR				 EQU	 0702h  ; 7-Segment Anzeige	
+
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX                
+
+endless:      
+				; Einlesen Memory (MEMR)  
+				MOV 	AX, 8C00h
+				MOV     ES, AX	; ist nur Segment
+				
+				MOV BX,100
+				MOV AX, ES:[BX]
+				
+				
+				; Ausgabe Port Data
+				MOV     DX, 0708h
+				OUT     [DX],AX
+				
+				
+				                 
+                JMP     endless
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start

@@ -1,0 +1,32 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 3: Testen IO
+;
+; Bus timing with logic analyzer: Memory accesses
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX
+                
+                             
+
+endless:        
+				;
+                MOV     DX, 0605 h
+                IN 		AL, [DX]
+                
+                ;ausgabe
+                OUT		[DX], AL
+                
+                JMP     endless
+                
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start

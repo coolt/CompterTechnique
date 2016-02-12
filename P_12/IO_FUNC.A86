@@ -1,0 +1,30 @@
+;******************************************************************************
+                NAME    IOFUNCT
+;******************************************************************************
+;  Funktion: 	
+;  Note:		int = 16 Bit bei Assembler
+;				char = 8 Bit  
+;	Nicht:		Datensegment, Alle Konstanten im Kopf. Das alles wird nicht gebraucht.
+;				Kein Start: endless: Denn im C-Programm ist die Endlosschleife.
+;******************************************************************************
+.MODEL small
+.186
+
+
+;------------  code section  ----------------------------------------------
+.CODE			; Die Funktion steht im Code
+				PUBLIC _OUTWORD		 ; alles Grossbuchstaben notwendig
+
+				; Parameter der Funktion definieren
+				para_1	EQU [BP + 4]	; in BP + 2 steht die Rücksprungadresse	
+				para_2  EQU [BP + 6]			
+				
+_OUTWORD:		; Funktionsname muss mit Grossbuchstaben und Underline stehen
+				PUSH BP
+				MOV BP,SP
+				MOV AX, para_1
+				MOV DX, para_2
+				OUT [DX], AX
+				POP BP
+				RET
+END

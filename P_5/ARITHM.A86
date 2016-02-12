@@ -1,0 +1,110 @@
+;***************************************************************
+;  Beispiele zum Thema arithmetische Befehle 
+;***************************************************************
+.MODEL small
+
+;------------  code section  ------------------------
+.CODE
+
+start:          MOV   AX,@data       ; Anfang Datensegment
+                MOV   DS,AX          ; in DS-Register laden
+
+;*****************************************************
+;     Inkrement / Dekrement    Flags beobachten
+;*****************************************************
+LOOPA:
+                MOV     AX,1
+                INC     AX
+                INC     AX
+                DEC     AX
+                DEC     AX
+                DEC     AX
+                DEC     AX
+                INC     AX
+                INC     AX
+
+                MOV     BL,3
+                INC     BL
+                DEC     BL
+                DEC     BL
+                DEC     BL
+                DEC     BL
+                DEC     BL
+                INC     BL
+                INC     BL
+
+;*****************************************************
+;      ADD / SUB
+;*****************************************************
+                MOV     AX,2
+                ADD     AX,4
+                MOV     BX,7
+                SUB     BX,AX
+
+;*****************************************************
+;      Komplement Zwei
+;*****************************************************
+
+                MOV     CL,1
+                NEG     CL
+                NEG     CL
+
+                MOV     CH,2
+                NEG     CH
+                NEG     CH
+
+                SUB     CL,CH
+                NEG     CL
+                NEG     CL
+
+                MOV     AH,5
+                MOV     AL,1
+                CBW
+                NEG     AL
+                CBW
+
+;*****************************************************
+;      ADD /Subtrakt negativ/positiv overflow
+;*****************************************************
+                MOV     AL,7EH
+                ADD     AL,1
+                ADD     AL,1            ;overflow
+
+                MOV     AL,2
+                SUB     AL,1
+                SUB     AL,3            ;negativ
+                SUB     AL,127          ;overflow
+
+                MOV     AL,0FEH         ;negativ
+                ADD     AL,1
+                ADD     AL,3            ;positiv
+
+                
+;*****************************************************
+;      Multiplikation /Division
+;*****************************************************
+
+                MOV     CL,4
+                MOV     AL,4
+                MUL     CL
+                MUL     CL
+                MUL     CL
+                DIV     CL
+                MUL     CL
+                INC     AX
+                DIV     CL
+
+                MOV     AX,200H
+                MOV     BX,100H
+                MUL     BX
+                INC     AX
+                INC     AX
+                DIV     BX
+                JMP     LOOPA
+
+;------------  data section  ------------------------
+.DATA
+
+.STACK 100h
+;------------- end of program ------------------------
+           END   start

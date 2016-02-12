@@ -1,0 +1,44 @@
+;----------------------------------------------------
+; CT Praktikum 9
+;------------  Initial Declarations  ----------------
+
+SEG7_ADDR               EQU     0702h
+KEYS_ADDR               EQU     0706h
+
+
+.MODEL small
+.186
+
+;------------  code section  ------------------------
+.CODE
+public		readDice:near
+public		incDice:near
+
+endless:   
+
+incDice:		PROC NEAR
+				CMP wuerfel_zahl, 6h			
+if:				JAE else
+				INC wuerfel_zahl
+				JMP fertig
+				
+else:			MOV wuerfel_zahl, 0h
+						
+fertig:			RET
+
+								
+readDice:		PROC NEAR
+				MOV AX, wuerfel_zahl
+				RET
+              
+                JMP     endless
+
+;------------  data section  ------------------------
+.DATA
+wuerfel_zahl	db  01h
+
+;------------  stack section  ------------------------
+.STACK 100h
+
+;------------- end of program ------------------------
+                END     

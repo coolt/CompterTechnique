@@ -1,0 +1,45 @@
+;---------------------------------------------------------------
+;
+; CT2 - Praktikum 2
+;
+; Bus timing with logic analyzer
+;
+;---------------------------------------------------------------
+.186
+.model small
+
+.CODE
+start:          MOV     AX,@data
+                MOV     DS,AX                
+
+endless:        ; Write byte even
+                MOV     DX,600h
+                MOV     AL,012h
+                OUT     [DX],AL
+                OUT     [DX],AL ; kürzester Takt IO
+
+                ; Write byte odd
+                ;MOV     DX,602h
+               	;MOV     AL, 34h  ; kürzester Taktzyklus mit Wert- und Adressänderung
+                ;OUT     [DX],AL
+                ;INC 	AL
+                ;MOV		DX, 604h
+                ;OUT		[DX],AL
+                
+                ; Write word even
+                ;MOV     DX,602h
+                ;MOV     AX,05678h
+               ;OUT     [DX],AX                
+                
+                ; Write word odd
+                ;MOV     DX,605h
+                ;MOV     AX,0ABCDh
+                ;OUT     [DX],AX                                  
+
+                JMP     endless
+.DATA
+
+.STACK 100h
+
+;----- Programm-ende ------------------------------------------
+                END start
