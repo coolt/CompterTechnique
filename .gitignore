@@ -1,0 +1,5 @@
+# CT: Nur C-Files share
+# No executables
+**/*.MAP
+**/*.OBJ
+**/*.EXE
